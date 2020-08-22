@@ -16,18 +16,20 @@ export default function App() {
 
   useEffect(() => {
     api.get("repositories").then((response) => {
+      console.log(response);
       setRepositories(response.data);
     });
   }, []);
 
-  async function handleLikeRepository(id) {
-    const response = await api.post(`repositories/${id}/like`);
-    const updatedRepository = response.data;
-    repositories.find((repo) => repo.id === updatedRepository.id).likes =
-      updatedRepository.likes;
-    setRepositories(repositories);
-  }
 
+  async function handleLikeRepository(id) {
+    await api.post(`repositories/${id}/like`);
+
+    const newRepo = [...repositories];
+    const repoIndex = repositories.findIndex((repo) => repo.id === id);
+    newRepo[repoIndex].likes++;
+    setRepositories(newRepo);
+  }
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
@@ -39,9 +41,9 @@ export default function App() {
             <View style={styles.repositoryContainer}>
               <Text style={styles.repository}>{repository.title}</Text>
               <View style={styles.techsContainer}>
-                {repository.techs.map((tech) => (
+                {/* {repository.techs.map((tech) => (
                   <Text style={styles.tech}>{tech}</Text>
-                ))}
+                ))} */}
               </View>
               <View style={styles.likesContainer}>
                 <Text
@@ -49,7 +51,7 @@ export default function App() {
                   // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
                   testID={`repository-likes-${repository.id}`}
                 >
-                  {repository.likes} curtida
+                  {repository.likes} curtidas
                 </Text>
               </View>
               <TouchableOpacity
